@@ -59,6 +59,7 @@ int main(){
         int u, v, w;
         cin >> u >> v >> w;
         s.insert(u);
+        s.insert(v);
         g[u].push_back(v);
         cost[u].push_back(w);
     }
