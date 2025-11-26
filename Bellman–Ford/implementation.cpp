@@ -1,66 +1,88 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+void bellmanford(vector<vector<int>> &g, vector<vector<int>> &cost, vector<int> &dis, vector<int> &parent, int src, int n)
+{
 
-struct Edge {
-    int u, v, w;
-};
-
-bool bellmanFord(int n, int src, vector<Edge>& edges, vector<int>& dist, vector<int>& parent) {
-    dist.assign(n, INT_MAX);
+    dis.assign(n, INT_MAX);
     parent.assign(n, -1);
+    dis[src] = 0;
 
-    dist[src] = 0;
+    for (int k = 0; k < n - 1; k++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            int u = i;
+            for (int j = 0; j < g[u].size(); j++)
+            {
+                int v = g[u][j];
+                int w = cost[u][j];
 
- 
-    for (int i = 1; i <= n - 1; i++) {
-        bool changed = false;
-
-        for (auto &e : edges) {
-            if (dist[e.u] != INT_MAX && dist[e.u] + e.w < dist[e.v]) {
-                dist[e.v] = dist[e.u] + e.w;
-                parent[e.v] = e.u;
-                changed = true;
+                if (dis[v] > dis[u] + w)
+                {
+                    dis[v] = dis[u] + w;
+                    parent[v] = u;
+                }
             }
         }
-
-   
-        if (!changed) break;
     }
 
-   
-    for (auto &e : edges) {
-        if (dist[e.u] != INT_MAX && dist[e.u] + e.w < dist[e.v]) {
-            return false; 
+    for (int i = 0; i < n; i++)
+    {
+        int u = i;
+        if (dis[u] == INT_MAX)
+            continue;
+        for (int j = 0; j < g[u].size(); j++)
+        {
+            int v = g[u][j];
+            int w = cost[u][j];
+
+            if (dis[v] > dis[u] + w)
+            {
+                cout << "-ne cycle is ditected" << endl;
+            }
         }
     }
-
-    return true; 
 }
 
-int main() {
+int main()
+{
+
     int n, e;
     cin >> n >> e;
 
-    vector<Edge> edges(e);
+    vector<vector<int>> g(n), cost(n);
+    vector<int> dis(n), parent(n);
+    unordered_set<int> s;
 
-    for (int i = 0; i < e; i++) {
-        cin >> edges[i].u >> edges[i].v >> edges[i].w;
+    for (int i = 0; i < e; i++)
+    {
+        int u, v, w;
+        cin >> u >> v >> w;
+
+        g[u].push_back(v);
+        cost[u].push_back(w);
+        s.insert(u), s.insert(v);
     }
 
     int src;
     cin >> src;
 
-    vector<int> dist(n), parent(n);
+    bellmanford(g, cost, dis, parent, src, n);
 
-    if (!bellmanFord(n, src, edges, dist, parent)) {
-        cout << "Negative Weight Cycle Detected\n";
-        return 0;
-    }
+    for (int i = 0; i < dis.size(); i++)
+        cout << dis[i] << ' ';
 
-    cout << "Distances:\n";
-    for (int i = 0; i < n; i++)
-        cout << "Node " << i << " : " << dist[i] << "\n";
+    cout << endl;
+    vector<int> path;
+    int tg = 4;
+    for (int i = tg; i != -1; i = parent[i])
+        path.push_back(i);
+
+    reverse(path.begin(), path.end());
+
+    for (int i : path)
+        cout << i << ' ';
 
     return 0;
 }
